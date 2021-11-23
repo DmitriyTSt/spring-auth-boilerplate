@@ -1,15 +1,15 @@
-package ru.dmitriyt.springboilerplate.controller
+package ru.dmitriyt.springboilerplate.controller.security
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.client.HttpClientErrorException
+import org.springframework.web.server.ResponseStatusException
 import ru.dmitriyt.springboilerplate.config.jwt.JwtProvider
-import ru.dmitriyt.springboilerplate.controller.model.LoginRequest
-import ru.dmitriyt.springboilerplate.controller.model.RegistrationRequest
-import ru.dmitriyt.springboilerplate.controller.model.TokenResponse
+import ru.dmitriyt.springboilerplate.controller.base.BaseResponse
 import ru.dmitriyt.springboilerplate.entity.UserEntity
 import ru.dmitriyt.springboilerplate.service.UserService
 
@@ -20,18 +20,18 @@ class SecurityController @Autowired constructor(
 ) {
 
     @PostMapping("/login")
-    fun login(@RequestBody request: LoginRequest): TokenResponse {
+    fun login(@RequestBody @Validated request: LoginRequest): BaseResponse<TokenResponse> {
         val userEntity = userService.findByLoginAndPassword(request.login, request.password)
         return userEntity
             ?.let { jwtProvider.generateToken(request.login) }
-            ?.let { TokenResponse(it) }
-            ?: throw HttpClientErrorException(HttpStatus.UNAUTHORIZED)
+            ?.let { BaseResponse(TokenResponse(it)) }
+            ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
     }
 
     @PostMapping("/registration")
     fun registration(@RequestBody request: RegistrationRequest) {
         if (request.login == null || request.password == null) {
-            throw HttpClientErrorException(HttpStatus.BAD_REQUEST, "login or password is empty")
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "login or password is empty")
         }
         val userEntity = UserEntity(login = request.login, password = request.password)
         userService.save(userEntity)

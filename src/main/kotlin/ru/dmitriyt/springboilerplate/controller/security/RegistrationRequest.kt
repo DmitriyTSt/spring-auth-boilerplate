@@ -1,4 +1,4 @@
-package ru.dmitriyt.springboilerplate.controller.model
+package ru.dmitriyt.springboilerplate.controller.security
 
 class RegistrationRequest(
     val login: String?,
