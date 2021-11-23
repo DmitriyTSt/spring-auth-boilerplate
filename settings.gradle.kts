@@ -1,1 +1,1 @@
-rootProject.name = "sprint-auth-boilerplate"
+rootProject.name = "spring-auth-boilerplate"
