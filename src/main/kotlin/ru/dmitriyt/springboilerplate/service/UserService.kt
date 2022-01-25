@@ -4,15 +4,19 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import ru.dmitriyt.springboilerplate.entity.UserEntity
-import ru.dmitriyt.springboilerplate.repository.UserEntityRepository
+import ru.dmitriyt.springboilerplate.repository.UserProfileRepository
 
 @Service
 class UserService @Autowired constructor(
-    private val repository: UserEntityRepository,
+    private val repository: UserProfileRepository,
     private val passwordEncoder: PasswordEncoder,
 ) {
-    fun save(userEntity: UserEntity): UserEntity {
+    fun create(userEntity: UserEntity): UserEntity {
         userEntity.password = passwordEncoder.encode(userEntity.password)
+        return repository.save(userEntity)
+    }
+
+    fun save(userEntity: UserEntity): UserEntity {
         return repository.save(userEntity)
     }
 

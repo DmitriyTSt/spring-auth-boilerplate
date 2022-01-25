@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import ru.dmitriyt.springboilerplate.config.property.JwtSettings
-import ru.dmitriyt.springboilerplate.dto.auth.Token
+import ru.dmitriyt.springboilerplate.dto.model.Token
 import ru.dmitriyt.springboilerplate.dto.enums.ApiError
 import ru.dmitriyt.springboilerplate.dto.enums.Os
 import ru.dmitriyt.springboilerplate.dto.enums.getException
@@ -48,6 +48,10 @@ class TokenService @Autowired constructor(
         return Token.fromEntity(repository.save(tokenPair), jwtSettings.accessTokenExpirationTime)
     }
 
+    fun getCurrentTokenPair(): TokenPairEntity {
+        return repository.findTokenPair()
+    }
+
     private fun buildToken(userId: Long, deviceId: String, isAnonym: Boolean, os: Os): TokenPairEntity {
         return TokenPairEntity(
             accessToken = createAccessToken(deviceId),
@@ -77,6 +81,10 @@ class TokenService @Autowired constructor(
             .setExpiration(expireDate)
             .signWith(SignatureAlgorithm.HS512, jwtSettings.secret)
             .compact()
+    }
+
+    private fun getDeviceIdFromAccessToken(accessToken: String): String {
+        return Jwts.parser().setSigningKey(jwtSettings.secret).parseClaimsJws(accessToken).body.subject
     }
 
     private fun TokenPairEntity.isExpired(): Boolean {

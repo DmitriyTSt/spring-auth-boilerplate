@@ -1,4 +1,4 @@
-package ru.dmitriyt.springboilerplate.dto.auth
+package ru.dmitriyt.springboilerplate.dto.model
 
 import ru.dmitriyt.springboilerplate.entity.TokenPairEntity
 
