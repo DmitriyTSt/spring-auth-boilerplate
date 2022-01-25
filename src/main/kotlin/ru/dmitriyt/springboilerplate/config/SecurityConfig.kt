@@ -7,23 +7,29 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
-import ru.dmitriyt.springboilerplate.config.jwt.JwtFilter
+import ru.dmitriyt.springboilerplate.config.jwt.JwtAuthenticationEntryPoint
+import ru.dmitriyt.springboilerplate.config.jwt.JwtAuthorizationFilter
 
 @Configuration
 @EnableWebSecurity
 class SecurityConfig @Autowired constructor(
-    private val jwtFilter: JwtFilter,
+    private val jwtAuthorizationFilter: JwtAuthorizationFilter,
+    private val jwtAuthenticationEntryPoint: JwtAuthenticationEntryPoint,
 ) : WebSecurityConfigurerAdapter() {
 
     override fun configure(http: HttpSecurity) {
-        http
-            .httpBasic().disable()
-            .csrf().disable()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
+        http.csrf().disable()
             .authorizeRequests()
-            .antMatchers("/user/*").hasRole("USER")
+            .antMatchers("/auth/anonym").permitAll()
+            .antMatchers("/auth/refresh").permitAll()
+            .anyRequest().authenticated()
             .and()
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .exceptionHandling()
+            .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+            .and()
+            .sessionManagement()
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+            .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter::class.java)
     }
 }

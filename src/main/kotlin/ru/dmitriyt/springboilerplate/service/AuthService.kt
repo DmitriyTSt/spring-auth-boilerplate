@@ -43,8 +43,8 @@ class AuthService @Autowired constructor(
         return tokenService.createToken(userProfile.id, anonymousProfile.deviceId, false, anonymousProfile.os)
     }
 
-    fun refreshToken(refreshTokenRequest: RefreshTokenRequest): Token {
-        return tokenService.refreshToken(refreshTokenRequest.deviceId, refreshTokenRequest.refreshToken)
+    fun refreshToken(deviceId: String, refreshToken: String): Token {
+        return tokenService.refreshToken(deviceId, refreshToken)
     }
 
     private fun updateAnonymousUser(user: AnonymousProfileEntity, os: Os): AnonymousProfileEntity {
