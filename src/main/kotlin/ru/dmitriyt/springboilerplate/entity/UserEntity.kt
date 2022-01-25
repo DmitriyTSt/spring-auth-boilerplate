@@ -1,6 +1,8 @@
 package ru.dmitriyt.springboilerplate.entity
 
 import javax.persistence.Entity
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.Table
 
@@ -8,6 +10,7 @@ import javax.persistence.Table
 @Table(name = "users")
 class UserEntity(
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     val id: Long = 0,
     val login: String,
     var password: String,

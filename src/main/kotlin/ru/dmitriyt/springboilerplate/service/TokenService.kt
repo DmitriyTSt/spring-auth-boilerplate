@@ -4,13 +4,14 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import ru.dmitriyt.springboilerplate.config.property.JwtSettings
-import ru.dmitriyt.springboilerplate.dto.model.Token
 import ru.dmitriyt.springboilerplate.dto.enums.ApiError
 import ru.dmitriyt.springboilerplate.dto.enums.Os
 import ru.dmitriyt.springboilerplate.dto.enums.getException
+import ru.dmitriyt.springboilerplate.dto.model.Token
 import ru.dmitriyt.springboilerplate.entity.TokenPairEntity
 import ru.dmitriyt.springboilerplate.repository.TokenPairRepository
 import java.time.LocalDateTime
@@ -49,7 +50,14 @@ class TokenService @Autowired constructor(
     }
 
     fun getCurrentTokenPair(): TokenPairEntity {
-        return repository.findTokenPair()
+        try {
+            val token = SecurityContextHolder.getContext().authentication.principal as TokenPairEntity
+
+            return repository.findByAccessTokenAndIsActiveIsTrue(token.accessToken)
+                ?: throw ApiError.ACCESS_TOKEN_NOT_FOUND.getException()
+        } catch (e: Exception) {
+            throw ApiError.ACCESS_TOKEN_NOT_FOUND.getException(e)
+        }
     }
 
     private fun buildToken(userId: Long, deviceId: String, isAnonym: Boolean, os: Os): TokenPairEntity {
@@ -64,16 +72,20 @@ class TokenService @Autowired constructor(
     }
 
     private fun createAccessToken(deviceId: String): String {
-        return createToken(deviceId, jwtSettings.accessTokenExpirationTime)
+        val expireDate = LocalDateTime.now()
+            .plusSeconds(jwtSettings.accessTokenExpirationTime)
+            .toInstant(ZoneOffset.UTC)
+            .let { Date.from(it) }
+        return Jwts.builder()
+            .setSubject(deviceId)
+            .setExpiration(expireDate)
+            .signWith(SignatureAlgorithm.HS512, jwtSettings.secret)
+            .compact()
     }
 
     private fun createRefreshToken(deviceId: String): String {
-        return createToken(deviceId, jwtSettings.refreshTokenExpirationTime)
-    }
-
-    private fun createToken(deviceId: String, expiresIn: Long): String {
         val expireDate = LocalDateTime.now()
-            .plusSeconds(expiresIn)
+            .plusDays(jwtSettings.refreshTokenExpirationTime)
             .toInstant(ZoneOffset.UTC)
             .let { Date.from(it) }
         return Jwts.builder()

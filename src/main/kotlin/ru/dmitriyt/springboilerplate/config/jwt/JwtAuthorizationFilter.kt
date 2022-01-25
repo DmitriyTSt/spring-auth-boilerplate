@@ -2,6 +2,7 @@ package ru.dmitriyt.springboilerplate.config.jwt
 
 import io.jsonwebtoken.Jwts
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
@@ -17,6 +18,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 @Component
+@EnableConfigurationProperties(JwtSettings::class)
 class JwtAuthorizationFilter @Autowired constructor(
     private val jwtSettings: JwtSettings,
     private val tokenPairRepository: TokenPairRepository,
@@ -42,7 +44,7 @@ class JwtAuthorizationFilter @Autowired constructor(
         val token = request.getHeader(AUTHORIZATION)
         val auth = AtomicReference<UsernamePasswordAuthenticationToken?>()
         if (token != null) {
-            tokenPairRepository.findByAccessTokenAndActiveIsTrue(token)?.takeIf { tokenPair ->
+            tokenPairRepository.findByAccessTokenAndIsActiveIsTrue(token)?.takeIf { tokenPair ->
                 try {
                     getExpiration(token).after(Date()) || tokenPair.isNotExpired()
                 } catch (e: Exception) {

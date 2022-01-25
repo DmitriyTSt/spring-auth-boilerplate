@@ -5,5 +5,5 @@ import ru.dmitriyt.springboilerplate.entity.AnonymousProfileEntity
 
 interface AnonymousProfileRepository : JpaRepository<AnonymousProfileEntity, Long> {
     fun findByDeviceId(deviceId: String): AnonymousProfileEntity?
-    fun findByDeviceIdAndActiveIsTrue(deviceId: String): AnonymousProfileEntity?
+    fun findByDeviceIdAndIsActiveIsTrue(deviceId: String): AnonymousProfileEntity?
 }
