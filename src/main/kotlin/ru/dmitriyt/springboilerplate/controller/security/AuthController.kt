@@ -16,7 +16,7 @@ import ru.dmitriyt.springboilerplate.dto.request.RegistrationRequest
 import ru.dmitriyt.springboilerplate.service.AuthService
 
 @RestController
-@RequestMapping("/auth", produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping("/api/auth", produces = [MediaType.APPLICATION_JSON_VALUE])
 class AuthController @Autowired constructor(
     private val authService: AuthService,
 ) {
