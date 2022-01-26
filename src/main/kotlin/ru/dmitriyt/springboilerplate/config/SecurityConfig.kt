@@ -20,9 +20,10 @@ class SecurityConfig @Autowired constructor(
     override fun configure(http: HttpSecurity) {
         http.csrf().disable()
             .authorizeRequests()
-            .antMatchers("/auth/anonym").permitAll()
-            .antMatchers("/auth/refresh").permitAll()
-            .anyRequest().authenticated()
+            .antMatchers("/api/auth/anonym").permitAll()
+            .antMatchers("/api/auth/refresh").permitAll()
+            .antMatchers("/api/**").authenticated()
+            .anyRequest().permitAll()
             .and()
             .exceptionHandling()
             .authenticationEntryPoint(jwtAuthenticationEntryPoint)

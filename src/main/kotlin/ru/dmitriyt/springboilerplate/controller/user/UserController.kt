@@ -11,7 +11,7 @@ import ru.dmitriyt.springboilerplate.entity.UserEntity
 import ru.dmitriyt.springboilerplate.service.UserService
 
 @RestController
-@RequestMapping("/user", produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping("/api/user", produces = [MediaType.APPLICATION_JSON_VALUE])
 class UserController @Autowired constructor(
     private val userService: UserService,
 ) {
