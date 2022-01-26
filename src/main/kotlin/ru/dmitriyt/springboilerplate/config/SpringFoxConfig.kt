@@ -2,6 +2,7 @@ package ru.dmitriyt.springboilerplate.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import ru.dmitriyt.springboilerplate.config.jwt.JwtAuthorizationFilter
 import springfox.documentation.builders.PathSelectors
 import springfox.documentation.builders.RequestHandlerSelectors
 import springfox.documentation.service.ApiKey
@@ -18,7 +19,7 @@ class SpringFoxConfig {
     fun api(): Docket {
         return Docket(DocumentationType.SWAGGER_2)
             .securityContexts(listOf(securityContext()))
-            .securitySchemes(listOf(ApiKey("JWT", "Authorization", "header")))
+            .securitySchemes(listOf(ApiKey("JWT", JwtAuthorizationFilter.AUTHORIZATION, "header")))
             .select()
             .apis(RequestHandlerSelectors.basePackage("ru.dmitriyt"))
             .paths(PathSelectors.any())
